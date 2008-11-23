@@ -1,0 +1,89 @@
+= Sexy PG Constraints
+
+If you're on PostgreSQL and see the importance of data-layer constraints - this gem/plugin is for you. It integrates constraints into PostgreSQL adapter so you can add/remove them in your migrations. You get two simple methods for adding/removing constraints, as well as a pack of pre-made constraints.
+
+== Install
+
+  gem install maxim-spc --source http://gems.github.com
+	
+== Usage
+
+Say you have a table "books" and you want your Postgres DB to ensure that their title is not-blank, alphanumeric, and its length is between 3 and 50 chars. You also want to make sure that their isbn is unique. In addition you want to blacklist a few isbn numbers from ever being in your database. You can tell all that to your Postgres in no time. Generate a migration and write the following.
+
+  class AddConstraintsToBooks < ActiveRecord::Migration
+    def self.up
+      constrain :books do |t|
+        t.title :not_blank => true, :alphanumeric => true, :length_within => 3..50
+        t.isbn :unique => true, :blacklist => %w(badbook1 badbook2)
+      end
+    end
+
+    def self.down
+      deconstrain :books do |t|
+        t.title :not_blank, :alphanumeric, :length_within
+        t.isbn :unique, :blacklist
+      end
+    end
+  end
+
+This will add all the necessary constraints to the database on the next migration, and remove them on rollback.
+
+There's also a syntax for when you don't need to work with multiple columns at once.
+
+  constrain :books, :title, :not_blank => true, :length_within => 3..50
+
+The above line works exactly the same as this block
+
+  constrain :books do |t|
+    t.title :not_blank => true, :length_within => 3..50
+  end
+	
+Same applies to deconstrain.
+
+== Available constraints
+
+Below is the list of constraints available and tested so far.
+
+* whitelist
+* blacklist
+* not_blank
+* within
+* length_within
+* email
+* alphanumeric
+* positive
+* unique
+* exact_length
+
+== Extensibility
+
+All constraints are located in the lib/constraints.rb. Extending this module with more methods will automatically make constraints available in migrations. All methods in the Constraints module are under module_function directive. Each method is supposed to return a piece of SQL that is inserted "alter table foo add constraint bar #{RIGHT HERE};."
+
+== TODO
+
+* Add foreign key constraints
+* Create better API for adding constraints
+* Add constraints with functionality corresponding to ActiveRecord validates_* pack
+
+== License
+
+Copyright (c) 2008 Maxim Chernyak
+ 
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+ 
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+ 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
