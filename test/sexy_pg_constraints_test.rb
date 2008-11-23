@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 # Database spc_test should be created manually.
 ActiveRecord::Base.establish_connection(:adapter => "postgresql", :database => "spc_test")
 
-# Setting sample up migrations
+# Setting up sample migrations
 class CreateBooks < ActiveRecord::Migration
   def self.up
     create_table :books do |t|
