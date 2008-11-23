@@ -4,7 +4,7 @@ If you're on PostgreSQL and see the importance of data-layer constraints - this 
 
 == Install
 
-  gem install maxim-spc --source http://gems.github.com
+  gem install maxim-sexy_pg_constraints --source http://gems.github.com
 	
 == Usage
 
