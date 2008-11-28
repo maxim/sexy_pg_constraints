@@ -3,8 +3,10 @@
 If you're on PostgreSQL and see the importance of data-layer constraints - this gem/plugin is for you. It integrates constraints into PostgreSQL adapter so you can add/remove them in your migrations. You get two simple methods for adding/removing constraints, as well as a pack of pre-made constraints.
 
 == Install
-
+As a gem
   gem install maxim-sexy_pg_constraints --source http://gems.github.com
+or as a plugin
+  script/plugin install git://github.com/maxim/sexy_pg_constraints.git
 	
 == Usage
 
