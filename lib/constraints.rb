@@ -103,5 +103,21 @@ module SexyPgConstraints
     def exact_length(column, options)
       "check ( length(trim(both from #{column})) = #{options} )"
     end
+    
+    ## 
+    # Add foreign key constraint.
+    #
+    # Example:
+    #   constrain :books, :author_id, :reference => {:authors => :id, :on_delete => :cascade}
+    #
+    def reference(column, options)
+      on_delete = options.delete(:on_delete)
+      fk_table = options.keys.first
+      fk_column = options[fk_table]
+      
+      on_delete = "on delete #{on_delete}" if on_delete
+      
+      "foreign key (#{column}) references #{fk_table} (#{fk_column}) #{on_delete}"
+    end
   end
 end

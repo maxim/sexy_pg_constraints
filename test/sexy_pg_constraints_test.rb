@@ -9,6 +9,7 @@ class CreateBooks < ActiveRecord::Migration
     create_table :books do |t|
       t.string  :title
       t.string  :author
+      t.integer :author_id
       t.integer :quantity
       t.string  :isbn
     end
@@ -19,15 +20,31 @@ class CreateBooks < ActiveRecord::Migration
   end
 end
 
+class CreateAuthors < ActiveRecord::Migration
+  def self.up
+    create_table :authors do |t|
+      t.string :name
+      t.string :bio
+    end
+  end
+  
+  def self.down
+    drop_table :authors
+  end
+end
+
 class Book < ActiveRecord::Base; end
+class Author < ActiveRecord::Base; end
 
 class SexyPgConstraintsTest < Test::Unit::TestCase
   def setup
     CreateBooks.up
+    CreateAuthors.up
   end
   
   def teardown
     CreateBooks.down
+    CreateAuthors.down
   end
   
   def test_should_create_book
@@ -268,6 +285,31 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     
     assert_allows do |book|
       book.isbn = '123456'
+    end
+  end
+  
+  def test_reference
+    ActiveRecord::Migration.constrain :books, :author_id, :reference => {:authors => :id}
+    
+    assert_prohibits :author_id, :reference, 'foreign key' do |book|
+      book.author_id = 1
+    end
+    
+    author = Author.new
+    author.name = "Mark Twain"
+    author.bio = "American writer"
+    author.save
+    
+    assert_equal 1, author.id
+    
+    assert_allows do |book|
+      book.author_id = 1
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, :author_id, :reference
+    
+    assert_allows do |book|
+      book.author_id = 2
     end
   end
   
