@@ -49,7 +49,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   
   def test_should_create_book
     Book.create
-    assert_equal Book.count, 1
+    assert_equal 1, Book.count
   end
   
   def test_whitelist
@@ -298,7 +298,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     author = Author.new
     author.name = "Mark Twain"
     author.bio = "American writer"
-    author.save
+    assert author.save
     
     assert_equal 1, author.id
     
@@ -313,6 +313,31 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     end
   end
   
+  def test_reference_with_on_delete
+    ActiveRecord::Migration.constrain :books, :author_id, :reference => {:authors => :id, :on_delete => :cascade}
+    
+    author = Author.new
+    author.name = "Mark Twain"
+    author.bio = "American writer"
+    assert author.save
+    
+    assert_equal 1, Author.count
+    
+    assert_allows do |book|
+      book.title = "The Adventures of Tom Sawyer"
+      book.author_id = 1
+    end
+    
+    assert_allows do |book|
+      book.title = "The Adventures of Huckleberry Finn"
+      book.author_id = 1
+    end
+    
+    author.destroy
+    
+    assert_equal 0, Author.count
+    assert_equal 0, Book.count
+  end
   
   def test_block_syntax
     ActiveRecord::Migration.constrain :books do |t|
@@ -400,6 +425,6 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     assert_nothing_raised do 
       book.save
     end
-    assert_equal Book.count, first_count + 1
+    assert_equal first_count + 1, Book.count
   end
 end
