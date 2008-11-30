@@ -405,8 +405,66 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     end
   end
   
+  def test_multicolumn_constraint
+    ActiveRecord::Migration.constrain :books, [:title, :isbn], :unique => true
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'foo'
+    end
+    
+    assert_prohibits [:title, :isbn], :unique, 'unique' do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, [:title, :isbn], :unique
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+  end
+  
+  def test_multicolumn_constraint_block_syntax
+    ActiveRecord::Migration.constrain :books do |t|
+      t[:title, :isbn].all :unique => true
+    end
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'foo'
+    end
+    
+    assert_prohibits [:title, :isbn], :unique, 'unique' do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+    
+    ActiveRecord::Migration.deconstrain :books do |t|
+      t[:title, :isbn].all :unique
+    end
+    
+    assert_allows do |book|
+      book.title = 'foo'
+      book.isbn = 'bar'
+    end
+  end
+  
   private
   def assert_prohibits(column, constraint, constraint_type = 'check')
+    column = column.join('_') if column.respond_to?(:join)
+    
     book = Book.new
     yield(book)
     assert book.valid?

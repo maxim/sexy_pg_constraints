@@ -91,6 +91,7 @@ module SexyPgConstraints
     #   constrain :books, :isbn, :unique => true
     #
     def unique(column, options)
+      column = column.join(', ') if column.respond_to?(:join)
       "unique (#{column})"
     end
     

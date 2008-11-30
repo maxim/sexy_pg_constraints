@@ -6,6 +6,8 @@ module SexyPgConstraints
     
     module ClassMethods
       def make_title(table, column, type)
+        column = column.join('_') if column.respond_to?(:join)
+        
         "#{table}_#{column}_#{type}"
       end
       
