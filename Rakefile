@@ -2,8 +2,8 @@ require 'rubygems'
 require 'rake'
 require 'echoe'
 
-Echoe.new('sexy_pg_constraints', '0.1.0') do |p|
-  p.description     = "Use migrations and painless syntax to manage constraints in PostgreSQL DB."
+Echoe.new('sexy_pg_constraints', '0.1.1') do |p|
+  p.description     = "Use migrations and simple syntax to manage constraints in PostgreSQL DB."
   p.url             = "http://github.com/maxim/sexy_pg_constraints"
   p.author          = "Maxim Chernyak"
   p.email           = "max@bitsonnet.com"
