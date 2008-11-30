@@ -83,6 +83,26 @@ module SexyPgConstraints
     def positive(column, options)
       "check (#{column} > 0)"
     end
+    
+    ## 
+    # Allow only odd values.
+    #
+    # Example:
+    #   constrain :books, :quantity, :odd => true
+    #
+    def odd(column, options)
+      "check (mod(#{column}, 2) != 0)"
+    end
+
+    ## 
+    # Allow only even values.
+    #
+    # Example:
+    #   constrain :books, :quantity, :even => true
+    #
+    def even(column, options)
+      "check (mod(#{column}, 2) = 0)"
+    end
 
     ## 
     # Make sure every entry in the column is unique.
@@ -103,6 +123,16 @@ module SexyPgConstraints
     #
     def exact_length(column, options)
       "check ( length(trim(both from #{column})) = #{options} )"
+    end
+    
+    ## 
+    # Allow only values that match the regular expression.
+    #
+    # Example:
+    #   constrain :orders, :visa, :format => /^([4]{1})([0-9]{12,15})$/
+    #
+    def format(column, options)
+      "check (((#{column})::text #{options.casefold? ? '~*' : '~'}  E'#{options.source}'::text ))"
     end
     
     ## 

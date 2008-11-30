@@ -103,6 +103,9 @@ Below is the list of constraints available and tested so far.
 * unique
 * exact_length
 * reference
+* even
+* odd
+* format
 
 == Extensibility
 
@@ -110,7 +113,6 @@ All constraints are located in the lib/constraints.rb. Extending this module wit
 
 == TODO
 
-* Add constraints with functionality corresponding to ActiveRecord validates_* pack
 * Create better API for adding constraints
 
 == License

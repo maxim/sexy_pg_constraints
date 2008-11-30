@@ -248,6 +248,42 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     end
   end
   
+  def test_odd
+    ActiveRecord::Migration.constrain :books, :quantity, :odd => true
+    
+    assert_prohibits :quantity, :odd do |book|
+      book.quantity = 2
+    end
+    
+    assert_allows do |book|
+      book.quantity = 1
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, :quantity, :odd
+    
+    assert_allows do |book|
+      book.quantity = 2
+    end
+  end
+  
+  def test_even
+    ActiveRecord::Migration.constrain :books, :quantity, :even => true
+    
+    assert_prohibits :quantity, :even do |book|
+      book.quantity = 1
+    end
+    
+    assert_allows do |book|
+      book.quantity = 2
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, :quantity, :even
+    
+    assert_allows do |book|
+      book.quantity = 1
+    end
+  end
+  
   def test_unique
     ActiveRecord::Migration.constrain :books, :isbn, :unique => true
     
@@ -285,6 +321,50 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     
     assert_allows do |book|
       book.isbn = '123456'
+    end
+  end
+  
+  def test_format_case_insensitive
+    ActiveRecord::Migration.constrain :books, :title, :format => /^[a-z]+$/i
+    
+    assert_prohibits :title, :format do |book|
+      book.title = 'abc3'
+    end
+    
+    assert_prohibits :title, :format do |book|
+      book.title = ''
+    end
+    
+    assert_allows do |book|
+      book.title = 'abc'
+    end
+    
+    assert_allows do |book|
+      book.title = 'ABc'
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, :title, :format
+    
+    assert_allows do |book|
+      book.title = 'abc3'
+    end
+  end
+  
+  def test_format_case_sensitive
+    ActiveRecord::Migration.constrain :books, :title, :format => /^[a-z]+$/
+    
+    assert_prohibits :title, :format do |book|
+      book.title = 'aBc'
+    end
+    
+    assert_allows do |book|
+      book.title = 'abc'
+    end
+    
+    ActiveRecord::Migration.deconstrain :books, :title, :format
+    
+    assert_allows do |book|
+      book.title = 'aBc'
     end
   end
   
