@@ -110,9 +110,8 @@ All constraints are located in the lib/constraints.rb. Extending this module wit
 
 == TODO
 
-* Add foreign key constraints
-* Create better API for adding constraints
 * Add constraints with functionality corresponding to ActiveRecord validates_* pack
+* Create better API for adding constraints
 
 == License
 
