@@ -81,7 +81,7 @@ module SexyPgConstraints
     #   constrain :books, :quantity, :positive => true
     #
     def positive(column, options)
-      "check (#{column} > 0)"
+      "check (#{column} >= 0)"
     end
     
     ## 

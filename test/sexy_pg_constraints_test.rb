@@ -238,6 +238,10 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     end
     
     assert_allows do |book|
+      book.quantity = 0
+    end
+    
+    assert_allows do |book|
       book.quantity = 1
     end
     

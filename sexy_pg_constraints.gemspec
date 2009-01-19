@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{sexy_pg_constraints}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Maxim Chernyak"]
-  s.date = %q{2008-11-30}
+  s.date = %q{2009-01-19}
   s.description = %q{Use migrations and simple syntax to manage constraints in PostgreSQL DB.}
   s.email = %q{max@bitsonnet.com}
   s.extra_rdoc_files = ["CHANGELOG.rdoc", "lib/constrainer.rb", "lib/constraints.rb", "lib/deconstrainer.rb", "lib/helpers.rb", "lib/sexy_pg_constraints.rb", "README.rdoc"]
