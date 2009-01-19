@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>maxim/sexy_pg_constraints @ GitHub</title>
+	
+	<style type="text/css">
+		body {
+  		margin-top: 1.0em;
+  		background-color: #d29846;
+		  font-family: "helvetica"; 
+  		color: #000000;
+    }
+    #container {
+      margin: 0 auto;
+      width: 700px;
+    }
+		h1 { font-size: 3.8em; color: #2d67b9; margin-bottom: 3px; }
+		h1 .small { font-size: 0.4em; }
+		h1 a { text-decoration: none }
+		h2 { font-size: 1.5em; color: #2d67b9; }
+    h3 { text-align: center; color: #2d67b9; }
+    a { color: #2d67b9; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .download { float: right; }
+		pre { background: #000; color: #fff; padding: 15px;}
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+	</style>
+	
+</head>
+
+<body>
+  <a href="http://github.com/maxim/sexy_pg_constraints"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  
+  <div id="container">
+
+    <div class="download">
+      <a href="http://github.com/maxim/sexy_pg_constraints/zipball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
+      <a href="http://github.com/maxim/sexy_pg_constraints/tarball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    </div>
+      
+    <h1><a href="http://github.com/maxim/sexy_pg_constraints">sexy_pg_constraints</a> 
+      <span class="small">by <a href="http://github.com/maxim">maxim</a></small></h1>
+
+    <div class="description">
+      Adds migration methods to manage constraints in PostgreSQL.
+    </div>
+
+    <p>= Sexy PG Constraints
+
+If you're on PostgreSQL and see the importance of data-layer constraints - this gem/plugin is for you. It integrates constraints into PostgreSQL adapter so you can add/remove them in your migrations. You get two simple methods for adding/removing constraints, as well as a pack of pre-made constraints.
+
+== Usage
+
+=== Single-column constraints
+Say you have a table "books" and you want your Postgres DB to ensure that their title is not-blank, alphanumeric, and its length is between 3 and 50 chars. You also want to make sure that their isbn is unique. In addition you want to blacklist a few isbn numbers from ever being in your database. You can tell all that to your Postgres in no time. Generate a migration and write the following.
+
+  class AddConstraintsToBooks < ActiveRecord::Migration
+    def self.up
+      constrain :books do |t|
+        t.title :not_blank => true, :alphanumeric => true, :length_within => 3..50
+        t.isbn :unique => true, :blacklist => %w(badbook1 badbook2)
+      end
+    end
+
+    def self.down
+      deconstrain :books do |t|
+        t.title :not_blank, :alphanumeric, :length_within
+        t.isbn :unique, :blacklist
+      end
+    end
+  end
+
+This will add all the necessary constraints to the database on the next migration, and remove them on rollback.
+
+There's also a syntax for when you don't need to work with multiple columns at once.
+
+  constrain :books, :title, :not_blank => true, :length_within => 3..50
+
+The above line works exactly the same as this block
+
+  constrain :books do |t|
+    t.title :not_blank => true, :length_within => 3..50
+  end
+	
+Same applies to deconstrain.
+
+=== Multi-column constraints
+Say you have the same table "books" only now you want to tell your Postgres to make sure that you should never have the same title + author_id combination. It means that you want to apply uniqueness to two columns, not just one. There is a special syntax for working with multicolumn constraints.
+
+  class AddConstraintsToBooks < ActiveRecord::Migration
+    def self.up
+      constrain :books do |t|
+        t[:title, :author_id].all :unique => true # Notice how multiple columns are listed in brackets.
+      end
+    end
+
+    def self.down
+      deconstrain :books do |t|
+        t[:title, :author_id].all :unique
+      end
+    end
+  end
+
+It's important to note that you shouldn't mix multicolumn constraints with regular ones in one line. This may cause unexpected behavior.
+
+=== Foreign key constrants
+In our table "books" we have column "author_id" which should reference the "id" column in the "authors" table. Here's the very simple syntax for setting up foreign key constraint that will tell Postgres to enforce this relationship.
+
+  class AddConstraintsToBooks < ActiveRecord::Migration
+    def self.up
+      constrain :books do |t|
+        t.author_id :reference => {:authors => :id, :on_delete => :cascade} # :on_delete is optional
+      end
+    end
+
+    def self.down
+      deconstrain :books do |t|
+        t.author_id :reference
+      end
+    end
+  end
+
+In this example we're telling Postgres to enforce the connection of author_id to the column "id" in table "authors". However, we're also telling it to cascade on delete. This means that when an author is deleted - every book that referred to that author will be deleted as well.
+
+== Available constraints
+
+Below is the list of constraints available and tested so far.
+
+* whitelist
+* blacklist
+* not_blank
+* within
+* length_within
+* email
+* alphanumeric
+* positive
+* unique
+* exact_length
+* reference
+* even
+* odd
+* format
+
+== Extensibility
+
+All constraints are located in the lib/constraints.rb. Extending this module with more methods will automatically make constraints available in migrations. All methods in the Constraints module are under module_function directive. Each method is supposed to return a piece of SQL that is inserted "alter table foo add constraint bar #{RIGHT HERE};."
+
+== TODO
+
+* Create better API for adding constraints</p><h2>Install</h2>
+<p>As a gem
+  gem install maxim-sexy_pg_constraints --source http://gems.github.com
+or as a plugin
+  script/plugin install git://github.com/maxim/sexy_pg_constraints.git
+	
+
+One more thing. Make sure that in your environment.rb file you have the following line uncommented.
+
+  config.active_record.schema_format = :sql
+
+Otherwise your test database will not have these constraints replicated.
+</p>
+<h2>License</h2>
+<p>Copyright (c) 2008 Maxim Chernyak
+ 
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+ 
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+ 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h2>Authors</h2>
+<p>Maxim Chernyak (max@bitsonnet.com)<br/><br/>      </p>
+<h2>Contact</h2>
+<p>Maxim Chernyak (max@bitsonnet.com)<br/>      </p>
+
+
+    <h2>Download</h2>
+    <p>
+      You can download this project in either
+      <a href="http://github.com/maxim/sexy_pg_constraints/zipball/master">zip</a> or
+      <a href="http://github.com/maxim/sexy_pg_constraints/tarball/master">tar</a> formats.
+    </p>
+    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+      by running:
+      <pre>$ git clone git://github.com/maxim/sexy_pg_constraints</pre>
+    </p>
+      
+    <div class="footer">
+      get the source code on GitHub : <a href="http://github.com/maxim/sexy_pg_constraints">maxim/sexy_pg_constraints</a>
+    </div>
+    
+  </div>
+
+  
+</body>
+</html>
