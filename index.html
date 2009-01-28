@@ -10,7 +10,6 @@
 	<style type="text/css">
 		body {
   		margin-top: 1.0em;
-  		background-color: #d29846;
 		  font-family: "helvetica"; 
   		color: #000000;
     }
@@ -18,7 +17,7 @@
       margin: 0 auto;
       width: 700px;
     }
-		h1 { font-size: 3.8em; color: #2d67b9; margin-bottom: 3px; }
+		h1 { font-size: 3.0em; color: #2d67b9; margin-bottom: 3px; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
 		h2 { font-size: 1.5em; color: #2d67b9; }
@@ -46,14 +45,13 @@
     </div>
       
     <h1><a href="http://github.com/maxim/sexy_pg_constraints">sexy_pg_constraints</a> 
-      <span class="small">by <a href="http://github.com/maxim">maxim</a></small></h1>
+      <span class="small">by <a href="http://github.com/maxim">Maxim Chernyak</a></small></h1>
 
     <div class="description">
       Adds migration methods to manage constraints in PostgreSQL.
     </div>
 
 <div class="wikistyle">
-<h1>Sexy PG Constraints</h1>
 <p>
 If you&#8217;re on PostgreSQL and see the importance of data-layer
 constraints - this gem/plugin is for you. It integrates constraints into
@@ -179,7 +177,7 @@ constraint that will tell Postgres to enforce this relationship.
   class AddConstraintsToBooks &lt; ActiveRecord::Migration
     def self.up
       constrain :books do |t|
-        t.author_id :reference =&gt; {:authors =&gt; :id, :on_delete =&gt; :cascade} # :on_delete is optional
+        t.author_id :reference =&gt; {:authors =&gt; :id, :on_delete =&gt; :cascade}
       end
     end
 
