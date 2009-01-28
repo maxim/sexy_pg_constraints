@@ -52,20 +52,57 @@
       Adds migration methods to manage constraints in PostgreSQL.
     </div>
 
-    <p>= Sexy PG Constraints
+<div class="wikistyle">
+<h1>Sexy PG Constraints</h1>
+<p>
+If you&#8217;re on PostgreSQL and see the importance of data-layer
+constraints - this gem/plugin is for you. It integrates constraints into
+PostgreSQL adapter so you can add/remove them in your migrations. You get
+two simple methods for adding/removing constraints, as well as a pack of
+pre-made constraints.
+</p>
+<h2>Install</h2>
 
-If you're on PostgreSQL and see the importance of data-layer constraints - this gem/plugin is for you. It integrates constraints into PostgreSQL adapter so you can add/remove them in your migrations. You get two simple methods for adding/removing constraints, as well as a pack of pre-made constraints.
+<p>
+As a gem
+</p>
+<pre>
+  gem install maxim-sexy_pg_constraints --source http://gems.github.com
+</pre>
+<p>
+or as a plugin
+</p>
+<pre>
+  script/plugin install git://github.com/maxim/sexy_pg_constraints.git
+</pre>
+<p>
+One more thing. Make sure that in your environment.rb file you have the
+following line uncommented.
+</p>
 
-== Usage
+<pre>
+  config.active_record.schema_format = :sql
+</pre>
+<p>
+Otherwise your test database will not have these constraints replicated.
+</p>
+<h2>Usage</h2>
+<h3>Single-column constraints</h3>
+<p>
+Say you have a table &quot;books&quot; and you want your Postgres DB to
+ensure that their title is not-blank, alphanumeric, and its length is
+between 3 and 50 chars. You also want to make sure that their isbn is
+unique. In addition you want to blacklist a few isbn numbers from ever
+being in your database. You can tell all that to your Postgres in no time.
+Generate a migration and write the following.
+</p>
 
-=== Single-column constraints
-Say you have a table "books" and you want your Postgres DB to ensure that their title is not-blank, alphanumeric, and its length is between 3 and 50 chars. You also want to make sure that their isbn is unique. In addition you want to blacklist a few isbn numbers from ever being in your database. You can tell all that to your Postgres in no time. Generate a migration and write the following.
-
-  class AddConstraintsToBooks < ActiveRecord::Migration
+<pre>
+  class AddConstraintsToBooks &lt; ActiveRecord::Migration
     def self.up
       constrain :books do |t|
-        t.title :not_blank => true, :alphanumeric => true, :length_within => 3..50
-        t.isbn :unique => true, :blacklist => %w(badbook1 badbook2)
+        t.title :not_blank =&gt; true, :alphanumeric =&gt; true, :length_within =&gt; 3..50
+        t.isbn :unique =&gt; true, :blacklist =&gt; %w(badbook1 badbook2)
       end
     end
 
@@ -76,28 +113,45 @@ Say you have a table "books" and you want your Postgres DB to ensure that their 
       end
     end
   end
+</pre>
+<p>
 
-This will add all the necessary constraints to the database on the next migration, and remove them on rollback.
-
-There's also a syntax for when you don't need to work with multiple columns at once.
-
-  constrain :books, :title, :not_blank => true, :length_within => 3..50
-
+This will add all the necessary constraints to the database on the next
+migration, and remove them on rollback.
+</p>
+<p>
+There&#8217;s also a syntax for when you don&#8217;t need to work with
+multiple columns at once.
+</p>
+<pre>
+  constrain :books, :title, :not_blank =&gt; true, :length_within =&gt; 3..50
+</pre>
+<p>
 The above line works exactly the same as this block
 
+</p>
+<pre>
   constrain :books do |t|
-    t.title :not_blank => true, :length_within => 3..50
+    t.title :not_blank =&gt; true, :length_within =&gt; 3..50
   end
-	
+</pre>
+<p>
 Same applies to deconstrain.
+</p>
+<h3>Multi-column constraints</h3>
+<p>
+Say you have the same table &quot;books&quot; only now you want to tell
+your Postgres to make sure that you should never have the same title +
+author_id combination. It means that you want to apply uniqueness to two
+columns, not just one. There is a special syntax for working with
+multicolumn constraints.
 
-=== Multi-column constraints
-Say you have the same table "books" only now you want to tell your Postgres to make sure that you should never have the same title + author_id combination. It means that you want to apply uniqueness to two columns, not just one. There is a special syntax for working with multicolumn constraints.
-
-  class AddConstraintsToBooks < ActiveRecord::Migration
+</p>
+<pre>
+  class AddConstraintsToBooks &lt; ActiveRecord::Migration
     def self.up
       constrain :books do |t|
-        t[:title, :author_id].all :unique => true # Notice how multiple columns are listed in brackets.
+        t[:title, :author_id].all :unique =&gt; true # Notice how multiple columns are listed in brackets.
       end
     end
 
@@ -107,16 +161,25 @@ Say you have the same table "books" only now you want to tell your Postgres to m
       end
     end
   end
+</pre>
+<p>
+It&#8217;s important to note that you shouldn&#8217;t mix multicolumn
+constraints with regular ones in one line. This may cause unexpected
+behavior.
+</p>
+<h3>Foreign key constrants</h3>
+<p>
 
-It's important to note that you shouldn't mix multicolumn constraints with regular ones in one line. This may cause unexpected behavior.
-
-=== Foreign key constrants
-In our table "books" we have column "author_id" which should reference the "id" column in the "authors" table. Here's the very simple syntax for setting up foreign key constraint that will tell Postgres to enforce this relationship.
-
-  class AddConstraintsToBooks < ActiveRecord::Migration
+In our table &quot;books&quot; we have column &quot;author_id&quot; which
+should reference the &quot;id&quot; column in the &quot;authors&quot;
+table. Here&#8217;s the very simple syntax for setting up foreign key
+constraint that will tell Postgres to enforce this relationship.
+</p>
+<pre>
+  class AddConstraintsToBooks &lt; ActiveRecord::Migration
     def self.up
       constrain :books do |t|
-        t.author_id :reference => {:authors => :id, :on_delete => :cascade} # :on_delete is optional
+        t.author_id :reference =&gt; {:authors =&gt; :id, :on_delete =&gt; :cascade} # :on_delete is optional
       end
     end
 
@@ -127,71 +190,114 @@ In our table "books" we have column "author_id" which should reference the "id" 
     end
   end
 
-In this example we're telling Postgres to enforce the connection of author_id to the column "id" in table "authors". However, we're also telling it to cascade on delete. This means that when an author is deleted - every book that referred to that author will be deleted as well.
-
-== Available constraints
-
-Below is the list of constraints available and tested so far.
-
-* whitelist
-* blacklist
-* not_blank
-* within
-* length_within
-* email
-* alphanumeric
-* positive
-* unique
-* exact_length
-* reference
-* even
-* odd
-* format
-
-== Extensibility
-
-All constraints are located in the lib/constraints.rb. Extending this module with more methods will automatically make constraints available in migrations. All methods in the Constraints module are under module_function directive. Each method is supposed to return a piece of SQL that is inserted "alter table foo add constraint bar #{RIGHT HERE};."
-
-== TODO
-
-* Create better API for adding constraints</p><h2>Install</h2>
-<p>As a gem
-  gem install maxim-sexy_pg_constraints --source http://gems.github.com
-or as a plugin
-  script/plugin install git://github.com/maxim/sexy_pg_constraints.git
-	
-
-One more thing. Make sure that in your environment.rb file you have the following line uncommented.
-
-  config.active_record.schema_format = :sql
-
-Otherwise your test database will not have these constraints replicated.
+</pre>
+<p>
+In this example we&#8217;re telling Postgres to enforce the connection of
+author_id to the column &quot;id&quot; in table &quot;authors&quot;.
+However, we&#8217;re also telling it to cascade on delete. This means that
+when an author is deleted - every book that referred to that author will be
+deleted as well.
 </p>
+<h2>Available constraints</h2>
+<p>
+Below is the list of constraints available and tested so far.
+</p>
+
+<ul>
+<li>whitelist
+
+</li>
+<li>blacklist
+
+</li>
+<li>not_blank
+
+</li>
+<li>within
+
+</li>
+<li>length_within
+
+</li>
+<li>email
+
+</li>
+<li>alphanumeric
+
+</li>
+<li>positive
+
+</li>
+
+<li>unique
+
+</li>
+<li>exact_length
+
+</li>
+<li>reference
+
+</li>
+<li>even
+
+</li>
+<li>odd
+
+</li>
+<li>format
+
+</li>
+</ul>
+<h2>Extensibility</h2>
+<p>
+All constraints are located in the lib/constraints.rb. Extending this
+module with more methods will automatically make constraints available in
+migrations. All methods in the Constraints module are under module_function
+directive. Each method is supposed to return a piece of SQL that is
+inserted &quot;alter table foo add constraint bar #{RIGHT HERE};.&quot;
+
+</p>
+<h2>TODO</h2>
+<ul>
+<li>Create better API for adding constraints
+
+</li>
+</ul>
 <h2>License</h2>
-<p>Copyright (c) 2008 Maxim Chernyak
- 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
- 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+<p>
+Copyright &#169; 2008 Maxim Chernyak
+</p>
+<p>
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the
+following conditions:
+
+</p>
+<p>
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+</p>
+<p>
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+</p>
+</div>
 <h2>Authors</h2>
-<p>Maxim Chernyak (max@bitsonnet.com)<br/><br/>      </p>
+<p>Maxim Chernyak (max@bitsonnet.com)
+<br/>
+<br/>      </p>
 <h2>Contact</h2>
-<p>Maxim Chernyak (max@bitsonnet.com)<br/>      </p>
+<p>Maxim Chernyak (max@bitsonnet.com)
+<br/>      </p>
 
 
     <h2>Download</h2>
