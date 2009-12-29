@@ -19,17 +19,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_whitelist
     ActiveRecord::Migration.constrain :books, :author, :whitelist => %w(whitelisted1 whitelisted2 whitelisted3)
     
-    assert_prohibits :author, :whitelist do |book|
+    assert_prohibits Book, :author, :whitelist do |book|
       book.author = 'not_whitelisted'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'whitelisted2'
     end
     
     ActiveRecord::Migration.deconstrain :books, :author, :whitelist
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'not_whitelisted'
     end
   end
@@ -37,17 +37,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_blacklist
     ActiveRecord::Migration.constrain :books, :author, :blacklist => %w(blacklisted1 blacklisted2 blacklisted3)
     
-    assert_prohibits :author, :blacklist do |book|
+    assert_prohibits Book, :author, :blacklist do |book|
       book.author = 'blacklisted2'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'not_blacklisted'
     end
     
     ActiveRecord::Migration.deconstrain :books, :author, :blacklist
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'blacklisted2'
     end
   end
@@ -55,17 +55,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_not_blank
     ActiveRecord::Migration.constrain :books, :author, :not_blank => true
     
-    assert_prohibits :author, :not_blank do |book|
+    assert_prohibits Book, :author, :not_blank do |book|
       book.author = ' '
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'foo'
     end
     
     ActiveRecord::Migration.deconstrain :books, :author, :not_blank
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = ' '
     end
   end
@@ -73,21 +73,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_within_inclusive
     ActiveRecord::Migration.constrain :books, :quantity, :within => 5..11
     
-    assert_prohibits :quantity, :within do |book|
+    assert_prohibits Book, :quantity, :within do |book|
       book.quantity = 12
     end
     
-    assert_prohibits :quantity, :within do |book|
+    assert_prohibits Book, :quantity, :within do |book|
       book.quantity = 4
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 7
     end
     
     ActiveRecord::Migration.deconstrain :books, :quantity, :within
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 12
     end
   end
@@ -95,21 +95,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_within_non_inclusive
     ActiveRecord::Migration.constrain :books, :quantity, :within => 5...11
     
-    assert_prohibits :quantity, :within do |book|
+    assert_prohibits Book, :quantity, :within do |book|
       book.quantity = 11
     end
     
-    assert_prohibits :quantity, :within do |book|
+    assert_prohibits Book, :quantity, :within do |book|
       book.quantity = 4
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 10
     end
     
     ActiveRecord::Migration.deconstrain :books, :quantity, :within
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 11
     end
   end
@@ -117,21 +117,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_length_within_inclusive
     ActiveRecord::Migration.constrain :books, :title, :length_within => 5..11
     
-    assert_prohibits :title, :length_within do |book|
+    assert_prohibits Book, :title, :length_within do |book|
       book.title = 'abcdefghijkl'
     end
     
-    assert_prohibits :title, :length_within do |book|
+    assert_prohibits Book, :title, :length_within do |book|
       book.title = 'abcd'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abcdefg'
     end
     
     ActiveRecord::Migration.deconstrain :books, :title, :length_within
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abcdefghijkl'
     end
   end
@@ -139,21 +139,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_length_within_non_inclusive
     ActiveRecord::Migration.constrain :books, :title, :length_within => 5...11
     
-    assert_prohibits :title, :length_within do |book|
+    assert_prohibits Book, :title, :length_within do |book|
       book.title = 'abcdefghijk'
     end
     
-    assert_prohibits :title, :length_within do |book|
+    assert_prohibits Book, :title, :length_within do |book|
       book.title = 'abcd'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abcdefg'
     end
     
     ActiveRecord::Migration.deconstrain :books, :title, :length_within
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abcdefghijk'
     end
   end
@@ -161,17 +161,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_email
     ActiveRecord::Migration.constrain :books, :author, :email => true
     
-    assert_prohibits :author, :email do |book|
+    assert_prohibits Book, :author, :email do |book|
       book.author = 'blah@example'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'blah@example.com'
     end
     
     ActiveRecord::Migration.deconstrain :books, :author, :email
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author = 'blah@example'
     end
   end 
@@ -179,17 +179,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_alphanumeric
     ActiveRecord::Migration.constrain :books, :title, :alphanumeric => true
     
-    assert_prohibits :title, :alphanumeric do |book|
+    assert_prohibits Book, :title, :alphanumeric do |book|
       book.title = 'asdf@asdf'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'asdf'
     end
     
     ActiveRecord::Migration.deconstrain :books, :title, :alphanumeric
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'asdf@asdf'
     end
   end
@@ -197,21 +197,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_positive
     ActiveRecord::Migration.constrain :books, :quantity, :positive => true
     
-    assert_prohibits :quantity, :positive do |book|
+    assert_prohibits Book, :quantity, :positive do |book|
       book.quantity = -1
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 0
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 1
     end
     
     ActiveRecord::Migration.deconstrain :books, :quantity, :positive
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = -1
     end
   end
@@ -219,17 +219,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_odd
     ActiveRecord::Migration.constrain :books, :quantity, :odd => true
     
-    assert_prohibits :quantity, :odd do |book|
+    assert_prohibits Book, :quantity, :odd do |book|
       book.quantity = 2
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 1
     end
     
     ActiveRecord::Migration.deconstrain :books, :quantity, :odd
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 2
     end
   end
@@ -237,17 +237,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_even
     ActiveRecord::Migration.constrain :books, :quantity, :even => true
     
-    assert_prohibits :quantity, :even do |book|
+    assert_prohibits Book, :quantity, :even do |book|
       book.quantity = 1
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 2
     end
     
     ActiveRecord::Migration.deconstrain :books, :quantity, :even
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.quantity = 1
     end
   end
@@ -255,17 +255,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_unique
     ActiveRecord::Migration.constrain :books, :isbn, :unique => true
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.isbn = 'foo'
     end
     
-    assert_prohibits :isbn, :unique, 'unique' do |book|
+    assert_prohibits Book, :isbn, :unique, 'unique' do |book|
       book.isbn = 'foo'
     end
     
     ActiveRecord::Migration.deconstrain :books, :isbn, :unique
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.isbn = 'foo'
     end
   end
@@ -273,21 +273,21 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_exact_length
     ActiveRecord::Migration.constrain :books, :isbn, :exact_length => 5
     
-    assert_prohibits :isbn, :exact_length do |book|
+    assert_prohibits Book, :isbn, :exact_length do |book|
       book.isbn = '123456'
     end
     
-    assert_prohibits :isbn, :exact_length do |book|
+    assert_prohibits Book, :isbn, :exact_length do |book|
       book.isbn = '1234'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.isbn = '12345'
     end
     
     ActiveRecord::Migration.deconstrain :books, :isbn, :exact_length
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.isbn = '123456'
     end
   end
@@ -295,25 +295,25 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_format_case_insensitive
     ActiveRecord::Migration.constrain :books, :title, :format => /^[a-z]+$/i
     
-    assert_prohibits :title, :format do |book|
+    assert_prohibits Book, :title, :format do |book|
       book.title = 'abc3'
     end
     
-    assert_prohibits :title, :format do |book|
+    assert_prohibits Book, :title, :format do |book|
       book.title = ''
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abc'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'ABc'
     end
     
     ActiveRecord::Migration.deconstrain :books, :title, :format
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abc3'
     end
   end
@@ -321,17 +321,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_format_case_sensitive
     ActiveRecord::Migration.constrain :books, :title, :format => /^[a-z]+$/
     
-    assert_prohibits :title, :format do |book|
+    assert_prohibits Book, :title, :format do |book|
       book.title = 'aBc'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'abc'
     end
     
     ActiveRecord::Migration.deconstrain :books, :title, :format
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'aBc'
     end
   end
@@ -339,7 +339,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_reference
     ActiveRecord::Migration.constrain :books, :author_id, :reference => {:authors => :id}
     
-    assert_prohibits :author_id, :reference, 'foreign key' do |book|
+    assert_prohibits Book, :author_id, :reference, 'foreign key' do |book|
       book.author_id = 1
     end
     
@@ -350,13 +350,13 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     
     assert_equal 1, author.id
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author_id = 1
     end
     
     ActiveRecord::Migration.deconstrain :books, :author_id, :reference
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.author_id = 2
     end
   end
@@ -371,12 +371,12 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
     
     assert_equal 1, Author.count
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = "The Adventures of Tom Sawyer"
       book.author_id = 1
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = "The Adventures of Huckleberry Finn"
       book.author_id = 1
     end
@@ -394,15 +394,15 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t.author :alphanumeric => true
     end
     
-    assert_prohibits :title, :not_blank do |book|
+    assert_prohibits Book, :title, :not_blank do |book|
       book.title = '  '
     end
     
-    assert_prohibits :isbn, :exact_length do |book|
+    assert_prohibits Book, :isbn, :exact_length do |book|
       book.isbn = 'asdf'
     end
     
-    assert_prohibits :author, :alphanumeric do |book|
+    assert_prohibits Book, :author, :alphanumeric do |book|
       book.author = 'foo#bar'
     end
     
@@ -412,7 +412,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t.author :alphanumeric
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title  = '  '
       book.isbn   = 'asdf'
       book.author = 'foo#bar'
@@ -424,15 +424,15 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t.title :not_blank => true, :alphanumeric => true, :blacklist => %w(foo bar)
     end
     
-    assert_prohibits :title, [:not_blank, :alphanumeric] do |book|
+    assert_prohibits Book, :title, [:not_blank, :alphanumeric] do |book|
       book.title = ' '
     end
     
-    assert_prohibits :title, :alphanumeric do |book|
+    assert_prohibits Book, :title, :alphanumeric do |book|
       book.title = 'asdf@asdf'
     end
     
-    assert_prohibits :title, :blacklist do |book|
+    assert_prohibits Book, :title, :blacklist do |book|
       book.title = 'foo'
     end
     
@@ -440,15 +440,15 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t.title :not_blank, :alphanumeric, :blacklist
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = ' '
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'asdf@asdf'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
     end
   end
@@ -456,24 +456,24 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
   def test_multicolumn_constraint
     ActiveRecord::Migration.constrain :books, [:title, :isbn], :unique => true
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'foo'
     end
     
-    assert_prohibits [:title, :isbn], :unique, 'unique' do |book|
+    assert_prohibits Book, [:title, :isbn], :unique, 'unique' do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
     
     ActiveRecord::Migration.deconstrain :books, [:title, :isbn], :unique
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
@@ -484,17 +484,17 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t[:title, :isbn].all :unique => true
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'foo'
     end
     
-    assert_prohibits [:title, :isbn], :unique, 'unique' do |book|
+    assert_prohibits Book, [:title, :isbn], :unique, 'unique' do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
@@ -503,7 +503,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t[:title, :isbn].all :unique
     end
     
-    assert_allows do |book|
+    assert_allows Book do |book|
       book.title = 'foo'
       book.isbn = 'bar'
     end
