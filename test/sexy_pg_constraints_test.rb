@@ -457,7 +457,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       t.title :not_blank => true, :alphanumeric => true, :blacklist => %w(foo bar)
     end
     
-    assert_prohibits :title, :not_blank do |book|
+    assert_prohibits :title, [:not_blank, :alphanumeric] do |book|
       book.title = ' '
     end
     
@@ -553,7 +553,7 @@ class SexyPgConstraintsTest < Test::Unit::TestCase
       book.save 
     end
     assert_match /PGError/, error.message
-    assert_match /violates #{constraint_type} constraint "books_#{column}_#{constraint}"/, error.message
+    assert_match /violates #{constraint_type} constraint "books_#{column}_(#{Array(constraint).map {|c| c.to_s }.join('|')})"/, error.message
   end
   
   def assert_allows
