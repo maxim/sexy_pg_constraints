@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-# Database spc_test should be created manually.
-ActiveRecord::Base.establish_connection(:adapter => "postgresql", :database => "spc_test")
+db_config_path = File.join(File.dirname(__FILE__), 'support', 'database.yml')
+ActiveRecord::Base.establish_connection(YAML::load(open(db_config_path)))
 
 # Setting up sample migrations
 class CreateBooks < ActiveRecord::Migration
