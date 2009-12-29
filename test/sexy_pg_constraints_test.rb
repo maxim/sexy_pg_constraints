@@ -1,8 +1,5 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-db_config_path = File.join(File.dirname(__FILE__), 'support', 'database.yml')
-ActiveRecord::Base.establish_connection(YAML::load(open(db_config_path)))
-
 # Setting up sample migrations
 class CreateBooks < ActiveRecord::Migration
   def self.up
