@@ -8,8 +8,8 @@ module SexyPgConstraints
     # Example: 
     #   constrain :books, :variation, :whitelist => %w(hardcover softcover)
     #
-    def whitelist(column, options)
-      "check (#{column} in (#{ options.collect{|v| "'#{v}'"}.join(',')  }))"
+    def whitelist(table, column, options)
+      "check (#{table}.#{column} in (#{ options.collect{|v| "'#{v}'"}.join(',')  }))"
     end
   
     ## 
@@ -18,8 +18,8 @@ module SexyPgConstraints
     # Example: 
     #   constrain :books, :isbn, :blacklist => %w(invalid_isbn1 invalid_isbn2)
     #
-    def blacklist(column, options)
-      "check (#{column} not in (#{ options.collect{|v| "'#{v}'"}.join(',') }))"
+    def blacklist(table, column, options)
+      "check (#{table}.#{column} not in (#{ options.collect{|v| "'#{v}'"}.join(',') }))"
     end
   
     ## 
@@ -28,8 +28,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :title, :not_blank => true
     #
-    def not_blank(column, options)
-      "check ( length(trim(both from #{column})) > 0 )"
+    def not_blank(table, column, options)
+      "check ( length(trim(both from #{table}.#{column})) > 0 )"
     end
 
     ## 
@@ -40,8 +40,9 @@ module SexyPgConstraints
     #   constrain :books, :year, :within => 1980...2009
     # (the two lines above do the same thing)
     #
-    def within(column, options)
-      "check (#{column} >= #{options.begin} and #{column} #{options.exclude_end? ? ' < ' : ' <= '} #{options.end})"
+    def within(table, column, options)
+      column_ref = column.to_s.include?('.') ? column : "#{table}.#{column}"
+      "check (#{column_ref} >= #{options.begin} and #{column_ref} #{options.exclude_end? ? ' < ' : ' <= '} #{options.end})"
     end
 
     ## 
@@ -50,8 +51,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :author, :length_within => 4..50
     #
-    def length_within(column, options)
-      within("length(#{column})", options)
+    def length_within(table, column, options)
+      within(table, "length(#{table}.#{column})", options)
     end
     
     ## 
@@ -60,8 +61,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :author, :email => true
     #
-    def email(column, options)
-      "check (((#{column})::text ~ E'^([-a-z0-9]+)@([-a-z0-9]+[.]+[a-z]{2,4})$'::text))"
+    def email(table, column, options)
+      "check (((#{table}.#{column})::text ~ E'^([-a-z0-9]+)@([-a-z0-9]+[.]+[a-z]{2,4})$'::text))"
     end
 
     ## 
@@ -70,8 +71,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :author, :alphanumeric => true
     #
-    def alphanumeric(column, options)
-      "check (((#{column})::text ~* '^[a-z0-9]+$'::text))"
+    def alphanumeric(table, column, options)
+      "check (((#{table}.#{column})::text ~* '^[a-z0-9]+$'::text))"
     end
     
     ## 
@@ -80,8 +81,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :quantity, :positive => true
     #
-    def positive(column, options)
-      "check (#{column} >= 0)"
+    def positive(table, column, options)
+      "check (#{table}.#{column} >= 0)"
     end
     
     ## 
@@ -90,8 +91,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :quantity, :odd => true
     #
-    def odd(column, options)
-      "check (mod(#{column}, 2) != 0)"
+    def odd(table, column, options)
+      "check (mod(#{table}.#{column}, 2) != 0)"
     end
 
     ## 
@@ -100,8 +101,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :quantity, :even => true
     #
-    def even(column, options)
-      "check (mod(#{column}, 2) = 0)"
+    def even(table, column, options)
+      "check (mod(#{table}.#{column}, 2) = 0)"
     end
 
     ## 
@@ -110,8 +111,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :isbn, :unique => true
     #
-    def unique(column, options)
-      column = column.join(', ') if column.respond_to?(:join)
+    def unique(table, column, options)
+      column = Array(column).join(', ')
       "unique (#{column})"
     end
     
@@ -121,8 +122,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :hash, :exact_length => 32
     #
-    def exact_length(column, options)
-      "check ( length(trim(both from #{column})) = #{options} )"
+    def exact_length(table, column, options)
+      "check ( length(trim(both from #{table}.#{column})) = #{options} )"
     end
     
     ## 
@@ -131,8 +132,8 @@ module SexyPgConstraints
     # Example:
     #   constrain :orders, :visa, :format => /^([4]{1})([0-9]{12,15})$/
     #
-    def format(column, options)
-      "check (((#{column})::text #{options.casefold? ? '~*' : '~'}  E'#{options.source}'::text ))"
+    def format(table, column, options)
+      "check (((#{table}.#{column})::text #{options.casefold? ? '~*' : '~'}  E'#{options.source}'::text ))"
     end
     
     ## 
@@ -141,7 +142,7 @@ module SexyPgConstraints
     # Example:
     #   constrain :books, :author_id, :reference => {:authors => :id, :on_delete => :cascade}
     #
-    def reference(column, options)
+    def reference(table, column, options)
       on_delete = options.delete(:on_delete)
       fk_table = options.keys.first
       fk_column = options[fk_table]

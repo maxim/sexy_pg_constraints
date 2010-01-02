@@ -6,7 +6,9 @@ class CreateBooks < ActiveRecord::Migration
       t.string  :author
       t.integer :author_id
       t.integer :quantity
+      t.integer :from
       t.string  :isbn
+      t.string  :as
     end
   end
   
