@@ -112,7 +112,7 @@ module SexyPgConstraints
     #   constrain :books, :isbn, :unique => true
     #
     def unique(table, column, options)
-      column = Array(column).join(', ')
+      column = Array(column).map {|c| %{"#{c}"} }.join(', ')
       "unique (#{column})"
     end
     
@@ -149,7 +149,7 @@ module SexyPgConstraints
       
       on_delete = "on delete #{on_delete}" if on_delete
       
-      "foreign key (#{column}) references #{fk_table} (#{fk_column}) #{on_delete}"
+      %{foreign key ("#{column}") references #{fk_table} (#{fk_column}) #{on_delete}}
     end
   end
 end
