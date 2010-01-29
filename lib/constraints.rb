@@ -1,28 +1,28 @@
 module SexyPgConstraints
   module Constraints
     module_function
-    
+
     ##
     # Only allow listed values.
     #
-    # Example: 
+    # Example:
     #   constrain :books, :variation, :whitelist => %w(hardcover softcover)
     #
     def whitelist(table, column, options)
       "check (#{table}.#{column} in (#{ options.collect{|v| "'#{v}'"}.join(',')  }))"
     end
-  
-    ## 
+
+    ##
     # Prohibit listed values.
     #
-    # Example: 
+    # Example:
     #   constrain :books, :isbn, :blacklist => %w(invalid_isbn1 invalid_isbn2)
     #
     def blacklist(table, column, options)
       "check (#{table}.#{column} not in (#{ options.collect{|v| "'#{v}'"}.join(',') }))"
     end
-  
-    ## 
+
+    ##
     # The value must have at least 1 non-space character.
     #
     # Example:
@@ -32,7 +32,7 @@ module SexyPgConstraints
       "check ( length(trim(both from #{table}.#{column})) > 0 )"
     end
 
-    ## 
+    ##
     # The numeric value must be within given range.
     #
     # Example:
@@ -45,7 +45,7 @@ module SexyPgConstraints
       "check (#{column_ref} >= #{options.begin} and #{column_ref} #{options.exclude_end? ? ' < ' : ' <= '} #{options.end})"
     end
 
-    ## 
+    ##
     # Check the length of strings/text to be within the range.
     #
     # Example:
@@ -54,8 +54,8 @@ module SexyPgConstraints
     def length_within(table, column, options)
       within(table, "length(#{table}.#{column})", options)
     end
-    
-    ## 
+
+    ##
     # Allow only valid email format.
     #
     # Example:
@@ -65,7 +65,7 @@ module SexyPgConstraints
       "check (((#{table}.#{column})::text ~ E'^([-a-z0-9]+)@([-a-z0-9]+[.]+[a-z]{2,4})$'::text))"
     end
 
-    ## 
+    ##
     # Allow only alphanumeric values.
     #
     # Example:
@@ -74,8 +74,18 @@ module SexyPgConstraints
     def alphanumeric(table, column, options)
       "check (((#{table}.#{column})::text ~* '^[a-z0-9]+$'::text))"
     end
-    
-    ## 
+
+    ##
+    # Allow only lower case values.
+    #
+    # Example:
+    #   constrain :books, :author, :lowercase => true
+    #
+    def lowercase(table, column, options)
+      "check (#{table}.#{column} = lower(#{table}.#{column}))"
+    end
+
+    ##
     # Allow only positive values.
     #
     # Example:
@@ -84,8 +94,8 @@ module SexyPgConstraints
     def positive(table, column, options)
       "check (#{table}.#{column} >= 0)"
     end
-    
-    ## 
+
+    ##
     # Allow only odd values.
     #
     # Example:
@@ -95,7 +105,7 @@ module SexyPgConstraints
       "check (mod(#{table}.#{column}, 2) != 0)"
     end
 
-    ## 
+    ##
     # Allow only even values.
     #
     # Example:
@@ -105,7 +115,7 @@ module SexyPgConstraints
       "check (mod(#{table}.#{column}, 2) = 0)"
     end
 
-    ## 
+    ##
     # Make sure every entry in the column is unique.
     #
     # Example:
@@ -115,8 +125,8 @@ module SexyPgConstraints
       column = Array(column).map {|c| %{"#{c}"} }.join(', ')
       "unique (#{column})"
     end
-    
-    ## 
+
+    ##
     # Allow only text/strings of the exact length specified, no more, no less.
     #
     # Example:
@@ -125,8 +135,8 @@ module SexyPgConstraints
     def exact_length(table, column, options)
       "check ( length(trim(both from #{table}.#{column})) = #{options} )"
     end
-    
-    ## 
+
+    ##
     # Allow only values that match the regular expression.
     #
     # Example:
@@ -135,8 +145,8 @@ module SexyPgConstraints
     def format(table, column, options)
       "check (((#{table}.#{column})::text #{options.casefold? ? '~*' : '~'}  E'#{options.source}'::text ))"
     end
-    
-    ## 
+
+    ##
     # Add foreign key constraint.
     #
     # Example:
@@ -146,9 +156,9 @@ module SexyPgConstraints
       on_delete = options.delete(:on_delete)
       fk_table = options.keys.first
       fk_column = options[fk_table]
-      
+
       on_delete = "on delete #{on_delete}" if on_delete
-      
+
       %{foreign key ("#{column}") references #{fk_table} (#{fk_column}) #{on_delete}}
     end
   end
