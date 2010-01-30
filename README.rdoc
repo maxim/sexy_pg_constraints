@@ -106,6 +106,8 @@ Below is the list of constraints available and tested so far.
 * even
 * odd
 * format
+* lowercase
+* xor
 
 == Extensibility
 

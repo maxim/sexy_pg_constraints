@@ -127,6 +127,20 @@ module SexyPgConstraints
     end
 
     ##
+    # Allow only one of the values in the given columns to be true.
+    # Only reasonable with more than one column.
+    # See Enterprise Rails, Chapter 10 for details.
+    #
+    # Example:
+    #   constrain :books, [], :xor => true
+    #
+    def xor(table, column, options)
+      addition = Array(column).map {|c| %{("#{c}" is not null)::integer} }.join(' + ')
+
+      "check (#{addition} = 1)"
+    end
+
+    ##
     # Allow only text/strings of the exact length specified, no more, no less.
     #
     # Example:

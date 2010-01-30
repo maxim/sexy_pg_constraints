@@ -9,9 +9,11 @@ class CreateBooks < ActiveRecord::Migration
       t.integer :from
       t.string  :isbn
       t.string  :as
+      t.integer :xor_col_1
+      t.integer :xor_col_2
     end
   end
-  
+
   def self.down
     drop_table :books
   end
@@ -24,7 +26,7 @@ class CreateAuthors < ActiveRecord::Migration
       t.string :bio
     end
   end
-  
+
   def self.down
     drop_table :authors
   end
