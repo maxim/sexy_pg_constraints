@@ -120,10 +120,11 @@ All constraints are located in the lib/constraints.rb. Extending this module wit
 
 == Contributors
 * Empact[http://github.com/Empact] (Big thanks for lots of work. Better flexibility, more tests, organizing code, bug fixes.)
+* look[http://github.com/look (Extra constraints: lowercase and xor.)
 
 == License
 
-Copyright (c) 2008 Maxim Chernyak
+Copyright (c) 2010 Maxim Chernyak
  
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
