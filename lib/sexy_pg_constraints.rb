@@ -1,3 +1,4 @@
+require 'initializer'
 require "helpers"
 require "constrainer"
 require "deconstrainer"
@@ -20,5 +21,3 @@ module SexyPgConstraints
     end
   end
 end
-
-ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.send(:include, SexyPgConstraints)
