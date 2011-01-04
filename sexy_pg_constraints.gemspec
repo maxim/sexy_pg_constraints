@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = %q{Use migrations and simple syntax to manage constraints in PostgreSQL DB.}
   s.email = %q{max@bitsonnet.com}
   s.extra_rdoc_files = ["CHANGELOG.rdoc", "README.rdoc", "lib/constrainer.rb", "lib/constraints.rb", "lib/deconstrainer.rb", "lib/helpers.rb", "lib/sexy_pg_constraints.rb"]
-  s.files = ["CHANGELOG.rdoc", "Manifest", "README.rdoc", "Rakefile", "init.rb", "lib/constrainer.rb", "lib/constraints.rb", "lib/deconstrainer.rb", "lib/helpers.rb", "lib/sexy_pg_constraints.rb", "sexy_pg_constraints.gemspec", "test/postgresql_adapter.rb", "test/sexy_pg_constraints_test.rb", "test/support/assert_prohibits_allows.rb", "test/support/database.yml", "test/support/database.yml.example", "test/support/models.rb", "test/test_helper.rb"]
+  s.files = ["CHANGELOG.rdoc", "README.rdoc", "Rakefile", "init.rb", "lib/constrainer.rb", "lib/constraints.rb", "lib/deconstrainer.rb", "lib/helpers.rb", "lib/sexy_pg_constraints.rb", "sexy_pg_constraints.gemspec", "test/postgresql_adapter.rb", "test/sexy_pg_constraints_test.rb", "test/support/assert_prohibits_allows.rb", "test/support/database.yml.example", "test/support/models.rb", "test/test_helper.rb"]
   s.homepage = %q{http://github.com/maxim/sexy_pg_constraints}
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Sexy_pg_constraints", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
