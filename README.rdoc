@@ -1,3 +1,5 @@
+With [check constraints support](https://api.rubyonrails.org/v6.1.0/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_check_constraint) in Rails 6.1, this functionality should no longer be needed.
+
 = Sexy PG Constraints
 
 If you're on PostgreSQL and see the importance of data-layer constraints - this gem/plugin is for you. It integrates constraints into PostgreSQL adapter so you can add/remove them in your migrations. You get two simple methods for adding/removing constraints, as well as a pack of pre-made constraints.
