@@ -1,4 +1,4 @@
-With [check constraints support](https://api.rubyonrails.org/v6.1.0/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_check_constraint) in Rails 6.1, this functionality should no longer be needed.
+With check constraints support[https://api.rubyonrails.org/v6.1.0/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_check_constraint] in Rails 6.1, this functionality should no longer be needed.
 
 = Sexy PG Constraints
 
